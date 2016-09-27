@@ -1,4 +1,5 @@
-(ns clojure-game.generation)
+(ns clojure-game.generation
+  (:require [clojure.walk :as walk]))
 
 (def content
   (vec (shuffle (cons :chest (repeat 29 :empty)))))
@@ -40,3 +41,29 @@
   :empty
 
   )
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+
+(defn- rand-ratio []
+  (float (/ (+ 2 (rand-int 8)) 10)))
+
+(defn split [rects]
+  (walk/postwalk
+   #(if (map? %)
+      (let [dir (rand-nth [:w :h])
+            per (rand-ratio)]
+        [(update % dir * per)
+         (update % dir * (- 1 per))])
+      %)
+   rects))
+
+(defn pad [room]
+  (reduce (fn [r dim] (assoc r (keyword (str (name dim) "-actual"))
+                             (* (dim r) (rand-ratio)))) room [:w :h]))
+
+#_(->> (iterate split [{:w 100 :h 100}])
+       (take 10)
+       (last))

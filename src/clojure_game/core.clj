@@ -1,12 +1,14 @@
 (ns clojure-game.core
-  (:require [clojure.set :as set]
+  (:require [clojure-game.generation :as gen]
+            [clojure.set :as set]
             [lanterna.screen :as s]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Initial state
 
 (defn initial-state []
-  {:position {:x 0 :y 0}})
+  {:position {:x 1 :y 1}
+   :world    (gen/get-room)})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Updating the state
@@ -42,13 +44,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Render
 
+(def symbols
+  {:wall    \#
+   :default \.
+   :chest   \O})
+
 (defn clear-screen [screen]
   (let [blank (apply str (repeat 80 \space))]
     (doseq [row (range 24)]
       (s/put-string screen 0 row blank))))
 
-(defn render [screen {{:keys [x y]} :position :as state}]
+(defn render [screen {{:keys [x y]}                 :position
+                      {:keys [width height layout]} :world
+                      :as                           state}]
   (clear-screen screen)
+  (doseq [x (range width)
+          y (range height)]
+    (s/put-string screen x y (str (get symbols (or (:type (get-in layout [y x]))
+                                                   :default)))))
   (s/put-string screen x y "@")
   (s/redraw screen)
   state)
@@ -75,5 +88,7 @@
 (comment
 
   (-main)
+
+  (s/get-screen :auto {:cols 80 :rows 24})
 
   )
