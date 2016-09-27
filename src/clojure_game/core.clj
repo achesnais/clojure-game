@@ -6,9 +6,7 @@
 ;;; Initial state
 
 (defn initial-state []
-  {:position     {:x 0 :y 0}
-   :key-sequence []
-   :old-states   []})
+  {:position {:x 0 :y 0}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Updating the state
@@ -58,8 +56,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Loop
 
-(defn main [screen-type]
-  (let [screen (s/get-screen screen-type)]
+(defn run-game []
+  (let [screen (s/get-screen :auto {:cols 80 :rows 24})]
     (s/in-screen
      screen
      (loop [state (initial-state)]
@@ -71,13 +69,8 @@
                        (recur new-state))))))))
 
 
-(defn -main [& args]
-  (let [args        (set args)
-        screen-type (cond
-                      (args ":swing") :swing
-                      (args ":text")  :text
-                      :else           :auto)]
-    (main screen-type)))
+(defn -main []
+  (run-game))
 
 (comment
 
